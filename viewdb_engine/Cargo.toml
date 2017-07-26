@@ -1,0 +1,9 @@
+[package]
+name = "viewdb_engine"
+version = "0.1.0"
+authors = ["Yurii Rashkovskii <yrashk@gmail.com>"]
+
+[dependencies]
+lazy_static = "0.2.8"
+pumpkindb_engine = { git = "https://github.com/PumpkinDB/PumpkinDB", rev = "577adbe" }
+pumpkinscript = { git = "https://github.com/PumpkinDB/PumpkinDB", rev = "577adbe" }
