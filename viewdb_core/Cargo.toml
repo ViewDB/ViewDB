@@ -1,0 +1,10 @@
+[package]
+name = "viewdb_core"
+version = "0.1.0"
+authors = ["Yurii Rashkovskii <yrashk@gmail.com>"]
+
+[dependencies]
+uuid = {version = "0.5", features = ["v4"], optional = true}
+
+[features]
+uuid_v4_identifier = ["uuid"]
