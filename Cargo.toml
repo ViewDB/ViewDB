@@ -1,5 +1,7 @@
 [workspace]
 members = [
+  "./viewdb_core",
+  "./viewdb_query",
   "./viewdb_engine",
   "./viewdb"
 ]
