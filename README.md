@@ -172,5 +172,4 @@ as a result.
 
 ## Status
 
-ViewDB source code has not been published yet, but this is expected to happen during the
-summer of 2017.
+Early days. Not ready for any kind of use beyond its initial development.
