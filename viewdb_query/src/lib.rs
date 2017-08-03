@@ -11,7 +11,7 @@ pub(crate) use viewdb_core::{TraitPattern, TraitResolver};
 #[cfg(test)]
 pub(crate) use viewdb_core::{Trait};
 
-mod condition;
+pub mod condition;
 pub use condition::{Condition, Value};
 
 #[cfg(test)]
