@@ -1,0 +1,9 @@
+language: rust
+rust:
+  - stable
+  - nightly-2017-06-20
+matrix:
+  allow_failures:
+    - rust: stable
+script:
+  - make test

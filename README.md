@@ -1,5 +1,11 @@
 #  ViewDB
 
+| | |
+|-|-|
+| Build status (Linux) | [![Build Status](https://travis-ci.org/ViewDB/ViewDB.svg?branch=master)](https://travis-ci.org/ViewDB/ViewDB) |
+| Build status (Windows) | [![Windows Build status](https://ci.appveyor.com/api/projects/status/fx5p8is4ajjkgg1y?svg=true)](https://ci.appveyor.com/project/yrashk/viewdb) |
+| Project status | Early days |
+
 #### ViewDB is a *fact ⇒ domain* inference database.
 
 It means that the only *source of truth* data recorded in ViewDB is 
