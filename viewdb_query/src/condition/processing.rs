@@ -13,6 +13,16 @@ pub trait Processor<T> where T: AsRef<[u8]> + Clone {
     fn process(&self, condition: Condition<T>) -> Option<Condition<T>>;
 }
 
+pub trait ProcessorExtension<T> where T: AsRef<[u8]> + Clone {
+    fn after_that<P: Processor<T>>(self, processor: P) -> Option<Condition<T>>;
+}
+
+impl<T> ProcessorExtension<T> for Option<Condition<T>> where T: AsRef<[u8]> + Clone {
+    fn after_that<P: Processor<T>>(self, processor: P) -> Option<Condition<T>> {
+        self.and_then(|x| processor.process(x))
+    }
+}
+
 pub trait Recursive<T> : Processor<T> where T: AsRef<[u8]> + Clone {
     fn process_recursively(&self, condition: Condition<T>) -> Option<Condition<T>> {
         match condition {
@@ -144,5 +154,43 @@ impl<T: AsRef<[u8]> + Clone + PartialOrd> Processor<T> for BooleanLiteralSuppres
                 },
             c => self.process_recursively(c),
         }
+    }
+}
+
+
+pub struct ImplicitFact;
+impl<T: AsRef<[u8]> + Clone + PartialOrd> Recursive<T> for ImplicitFact {}
+
+impl<T: AsRef<[u8]> + Clone + PartialOrd> Processor<T> for ImplicitFact {
+    fn process(&self, condition: Condition<T>) -> Option<Condition<T>> {
+        fn contains_fact<T: AsRef<[u8]> + Clone + PartialOrd>(cond: &Condition<T>) -> bool {
+            match cond {
+                &Condition::Fact(_) => true,
+                &Condition::And(ref c1, ref c2) => contains_fact(c1) || contains_fact(c2),
+                &Condition::Or(ref c1, ref c2) => contains_fact(c1) || contains_fact(c2),
+                &Condition::Not(ref c) => contains_fact(c),
+                &Condition::Trait(_, ref c) => contains_fact(c),
+                _ => false,
+            }
+        }
+        if !contains_fact(&condition) {
+            Some(Condition::fact(condition))
+        } else {
+            Some(condition)
+        }
+    }
+}
+
+#[cfg(test)]
+mod tests {
+
+    use Condition::*;
+    use Value;
+    use condition::processing::{Processor, ImplicitFact};
+
+    #[test]
+    pub fn implicit_fact() {
+        let cond = Equal(Value::Attribute("a"), Value::Data("1"));
+        assert_matches!(ImplicitFact.process(cond), Some(Fact(_)));
     }
 }

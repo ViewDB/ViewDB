@@ -7,6 +7,9 @@
 extern crate try_opt;
 extern crate viewdb_core;
 
+#[cfg(test)] #[macro_use]
+extern crate assert_matches;
+
 pub(crate) use viewdb_core::{TraitPattern, TraitResolver};
 #[cfg(test)]
 pub(crate) use viewdb_core::{Trait};
@@ -18,8 +21,8 @@ pub use condition::{Condition, Value};
 mod tests {
     use super::{Value, Trait, TraitResolver, Condition};
     use super::Condition::{Equal};
-    use condition::processing::{Processor, TraitsExpansion, PresentEqualCompaction,
-                                ComparisonSuppression, BooleanLiteralSuppression};
+    use condition::processing::{Processor, ProcessorExtension, TraitsExpansion, PresentEqualCompaction,
+                                ComparisonSuppression, BooleanLiteralSuppression, ImplicitFact};
 
     #[derive(Clone)]
     pub struct Test<T : AsRef<[u8]> + Clone>((T, Trait<T>), (T, Trait<T>), (T, Trait<T>));
@@ -42,11 +45,9 @@ mod tests {
     #[test]
     fn it_works() {
         let cond =
-            Condition::fact(
                 Condition::trait_scope("Object", Equal(Value::Attribute("https://viewdb.org/attributes#object"), Value::Data("123")))
                 .and(Condition::trait_scope("NameChanged", Equal(Value::Attribute("https://viewdb.org/attributes#value"), Value::Binding("Name"))))
-                .and(Condition::trait_scope("Timestamp", Equal(Value::Attribute("https://viewdb.org/attributes#timestamp"), Value::Binding("Timestamp"))))
-            );
+                .and(Condition::trait_scope("Timestamp", Equal(Value::Attribute("https://viewdb.org/attributes#timestamp"), Value::Binding("Timestamp"))));
 
         let object = vec![("https://viewdb.org/attributes#object", None).into()].into();
         let name_changed = vec![("https://viewdb.org/attributes#factType", Some("NameChanged")).into(),
@@ -55,7 +56,13 @@ mod tests {
 
         let te = TraitsExpansion::new(Test(("Object", object), ("NameChanged", name_changed), ("Timestamp", timestamp)));
 
-        let cond1 = BooleanLiteralSuppression.process(ComparisonSuppression.process(PresentEqualCompaction.process(te.process(cond).unwrap()).unwrap()).unwrap()).unwrap();
+        let cond1 = te.process(cond)
+                    .after_that(PresentEqualCompaction)
+                    .after_that(ComparisonSuppression)
+                    .after_that(BooleanLiteralSuppression)
+                    .after_that(ImplicitFact)
+                    .unwrap();
+
         println!("{:#?}", cond1);
     }
 }
