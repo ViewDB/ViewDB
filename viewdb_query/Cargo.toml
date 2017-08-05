@@ -6,3 +6,6 @@ authors = ["Yurii Rashkovskii <yrashk@gmail.com>"]
 [dependencies]
 try_opt = "0.1.1"
 viewdb_core = { version = "0.1", path = "../viewdb_core" }
+
+[dev-dependencies]
+assert_matches = "1.1"
